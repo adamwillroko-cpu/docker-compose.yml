@@ -10,16 +10,12 @@ services:
       MYSQL_DATABASE: mautic
       MYSQL_USER: mautic
       MYSQL_PASSWORD: mautic_secure_pass
-    volumes:
-      - db_data:/var/lib/mysql
 
   mautic:
     image: mautic/mautic:5-apache
     container_name: mautic_app
     restart: always
     depends_on:
-      - db
-    links:
       - db
     ports:
       - "8080:80"
@@ -28,12 +24,3 @@ services:
       MAUTIC_DB_USER: mautic
       MAUTIC_DB_PASSWORD: mautic_secure_pass
       MAUTIC_DB_NAME: mautic
-    volumes:
-      - mautic_data:/var/www/html
-      - mautic_logs:/var/www/html/var/logs
-
-volumes:
-  db_data:
-  mautic_data:
-  mautic_logs:
-EOF
