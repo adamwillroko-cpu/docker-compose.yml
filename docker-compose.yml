@@ -1,32 +1,40 @@
-version: '3'
+cat << 'EOF' > docker-compose.yml
+version: '3.8'
 
 services:
-  mauticdb:
-    image: mysql:8.0
-    command: --default-authentication-plugin=mysql_native_password
-    volumes:
-      - mauticdb_data:/var/lib/mysql
+  db:
+    image: mariadb:10.11
+    container_name: mautic_db
+    restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=mysecretpassword
-      - MYSQL_DATABASE=mautic
-      - MYSQL_USER=mautic
-      - MYSQL_PASSWORD=mauticpassword
+      MYSQL_ROOT_PASSWORD: mautic_root_pass
+      MYSQL_DATABASE: mautic
+      MYSQL_USER: mautic
+      MYSQL_PASSWORD: mautic_secure_pass
+    volumes:
+      - db_data:/var/lib/mysql
 
   mautic:
-    image: mautic/mautic:v5-fpm
-    ports:
-      - "8080:80"
-    volumes:
-      - mautic_data:/var/www/html
-    environment:
-      - MAUTIC_DB_HOST=mauticdb
-      - MAUTIC_DB_USER=mautic
-      - MYSQL_PASSWORD=mauticpassword
-      - MAUTIC_DB_NAME=mautic
+    image: mautic/mautic:5-apache
+    container_name: mautic_app
     restart: always
     depends_on:
-      - mauticdb
+      - db
+    links:
+      - db
+    ports:
+      - "8080:80"
+    environment:
+      MAUTIC_DB_HOST: db
+      MAUTIC_DB_USER: mautic
+      MAUTIC_DB_PASSWORD: mautic_secure_pass
+      MAUTIC_DB_NAME: mautic
+    volumes:
+      - mautic_data:/var/www/html
+      - mautic_logs:/var/www/html/var/logs
 
 volumes:
-  mauticdb_data:
+  db_data:
   mautic_data:
+  mautic_logs:
+EOF
