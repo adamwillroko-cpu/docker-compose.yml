@@ -13,7 +13,7 @@ services:
       - MYSQL_PASSWORD=mauticpassword
 
   mautic:
-    image: mautic/mautic:v5-fpm # या latest
+    image: mautic/mautic:v5-fpm
     ports:
       - "8080:80"
     volumes:
