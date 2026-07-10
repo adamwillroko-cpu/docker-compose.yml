@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  mauticdb:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mauticdb_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=mysecretpassword
+      - MYSQL_DATABASE=mautic
+      - MYSQL_USER=mautic
+      - MYSQL_PASSWORD=mauticpassword
+
+  mautic:
+    image: mautic/mautic:v5-fpm # या latest
+    ports:
+      - "8080:80"
+    volumes:
+      - mautic_data:/var/www/html
+    environment:
+      - MAUTIC_DB_HOST=mauticdb
+      - MAUTIC_DB_USER=mautic
+      - MYSQL_PASSWORD=mauticpassword
+      - MAUTIC_DB_NAME=mautic
+    restart: always
+    depends_on:
+      - mauticdb
+
+volumes:
+  mauticdb_data:
+  mautic_data:
