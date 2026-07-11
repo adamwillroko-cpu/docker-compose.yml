@@ -1,26 +1,25 @@
-version: '3.8'
-
+cat << EOF > docker-compose.yml
 services:
-  db:
-    image: mariadb:10.11
-    container_name: mautic_db
+  ghost:
+    image: ghost:5-alpine
+    container_name: ghost_app
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: mautic_root_pass
-      MYSQL_DATABASE: mautic
-      MYSQL_USER: mautic
-      MYSQL_PASSWORD: mautic_secure_pass
-
-  mautic:
-    image: mautic/mautic:5-apache
-    container_name: mautic_app
-    restart: always
-    depends_on:
-      - db
     ports:
-      - "8080:80"
+      - "2368:2368"
+    volumes:
+      # Isse aapka data, images aur templates hamesha safe rahenge
+      - ghost_content:/var/lib/ghost/content
     environment:
-      MAUTIC_DB_HOST: db
-      MAUTIC_DB_USER: mautic
-      MAUTIC_DB_PASSWORD: mautic_secure_pass
-      MAUTIC_DB_NAME: mautic
+      url: https://${CODESPACE_NAME}-2368.app.github.dev
+      # Full Gmail SMTP Configuration
+      mail__transport: SMTP
+      mail__options__host: smtp.gmail.com
+      mail__options__port: 587
+      mail__options__secureConnection: "false"
+      mail__options__auth__user: YOUR_GMAIL_HERE@gmail.com
+      mail__options__auth__pass: YOUR_16_DIGIT_APP_PASSWORD_HERE
+      mail__from: YOUR_GMAIL_HERE@gmail.com
+
+volumes:
+  ghost_content:
+EOF
